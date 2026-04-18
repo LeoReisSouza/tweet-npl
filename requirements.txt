@@ -1,0 +1,12 @@
+jupyter
+pandas
+numpy
+tweepy>=4.0
+nltk
+textblob
+matplotlib
+seaborn
+scikit-learn
+requests
+openpyxl
+python-dotenv
