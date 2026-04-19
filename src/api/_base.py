@@ -27,6 +27,16 @@ class TwitterClient(ABC):
         """Obtém o ID do usuário a partir do username."""
         pass
     
+    @abstractmethod
+    def search(
+        self, 
+        query: str, 
+        max_results: int = 20,
+        product: str = "Latest"
+    ) -> list[Tweet]:
+        """Pesquisa tweets usando Advanced Search."""
+        pass
+    
     @property
     @abstractmethod
     def provider(self) -> str:

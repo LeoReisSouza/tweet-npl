@@ -97,6 +97,42 @@ class GetXAPIClient(TwitterClient):
         user = self.get_user(username)
         return user.id if user else None
     
+    def search(
+        self, 
+        query: str, 
+        max_results: int = 20,
+        product: str = "Latest"
+    ) -> list[Tweet]:
+        """Pesquisa tweets usando Advanced Search."""
+        url = f"{self.BASE_URL}/twitter/tweet/advanced_search"
+        
+        params = {
+            "q": query,
+            "product": product,
+            "count": min(max_results, 20)
+        }
+        
+        response = self._session.get(url, params=params)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        tweets = []
+        for item in data.get("tweets", []):
+            tweet = Tweet(
+                id=item.get("id", ""),
+                text=item.get("text", ""),
+                created_at=self._parse_datetime(item.get("createdAt")),
+                author_id=item.get("author", {}).get("id"),
+                author_username=item.get("author", {}).get("username"),
+                likes=item.get("likeCount", 0),
+                retweets=item.get("retweetCount", 0),
+                replies=item.get("replyCount", 0)
+            )
+            tweets.append(tweet)
+        
+        return tweets
+    
     def _parse_datetime(self, dt_str: str) -> Optional[datetime]:
         if not dt_str:
             return None

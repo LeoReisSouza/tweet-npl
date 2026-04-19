@@ -81,6 +81,38 @@ class XTwitterClient(TwitterClient):
         
         return response.data.id
     
+    def search(
+        self, 
+        query: str, 
+        max_results: int = 20,
+        product: str = "Latest"
+    ) -> list[Tweet]:
+        """Pesquisa tweets usando Advanced Search."""
+        # Ignora 'product' - X API não suporta
+        response = self._client.search_recent_tweets(
+            query=query,
+            max_results=max_results,
+            tweet_fields=['created_at', 'public_metrics', 'author_id']
+        )
+        
+        if not response.data:
+            return []
+        
+        tweets = []
+        for item in response.data:
+            metrics = item.public_metrics or {}
+            tweet = Tweet(
+                id=item.id,
+                text=item.text,
+                created_at=item.created_at,
+                likes=metrics.get('like_count', 0),
+                retweets=metrics.get('retweet_count', 0),
+                replies=metrics.get('reply_count', 0)
+            )
+            tweets.append(tweet)
+        
+        return tweets
+    
     def test_connection(self) -> dict:
         """Testa se as credenciais são válidas."""
         try:
